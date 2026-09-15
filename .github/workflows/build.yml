@@ -1,0 +1,38 @@
+name: Build SpeedLoc APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+
+      - name: Descompactar projeto
+        run: |
+          unzip -q SpeedLocPessoal_GITHUB.zip -d projeto
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK
+        run: |
+          cd projeto/SpeedLocPessoal
+          gradle --no-daemon :app:assembleDebug
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpeedLocPessoal-APK
+          path: projeto/SpeedLocPessoal/app/build/outputs/apk/debug/app-debug.apk
